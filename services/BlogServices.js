@@ -30,7 +30,7 @@ const nonExistingId = async () => {
 
 const populateDb = () => Blog.insertMany(initialBlogs, { ordered: true });
 
-const getBlogs = () => Blog.find({});
+const getBlogs = () => Blog.find({}).populate('user', { username: 1, name: 1 });
 
 const getBlog = (id) => Blog.findById(id);
 

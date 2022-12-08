@@ -11,6 +11,7 @@ const {
 } = require('./utils/middleware');
 
 const { _info, _error } = require('./utils/logger');
+const userRouter = require('./routes/UserRoutes');
 
 const app = express();
 
@@ -35,6 +36,8 @@ app.use(cors());
 app.use(requestLogger);
 
 app.use('/api/blogs', blogRouter);
+
+app.use('/api/users', userRouter);
 
 app.use(unknownEndpoint);
 

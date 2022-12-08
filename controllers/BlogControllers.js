@@ -8,6 +8,8 @@ const {
   deleteAllBlogs,
 } = require('../services/BlogServices');
 
+const User = require('../models/User');
+
 const getBlogs = async (req, res) => {
   const blogs = await _getBlogs();
   res.json(blogs);
@@ -24,11 +26,15 @@ const getBlog = async (req, res) => {
 
 const createBlog = async (req, res) => {
   const body = req.body;
+
+  const user = await User.findById(body.userId);
+
   const blog = {
     title: body.title,
     author: body.author,
     url: body.url,
     likes: body.likes ?? 0,
+    user: user._id,
   };
 
   if (!blog.title || !blog.url) {
@@ -36,6 +42,8 @@ const createBlog = async (req, res) => {
   }
 
   const createdBlog = await _createBlog(blog);
+  user.blogs = user.blogs.concat(createdBlog._id);
+  await user.save();
   res.status(201).json(createdBlog);
 };
 
