@@ -28,14 +28,20 @@ const createBlog = async (req, res) => {
     title: body.title,
     author: body.author,
     url: body.url,
-    likes: body.likes,
+    likes: body.likes ?? 0,
   };
+
+  if (!blog.title || !blog.url) {
+    return res.status(400).send({ error: 'title or url missing' });
+  }
+
   const createdBlog = await _createBlog(blog);
   res.status(201).json(createdBlog);
 };
 
 const deleteBlog = async (req, res) => {
   const deletedBlog = await _deleteBlog(req.params.id);
+  if (!deletedBlog) return res.status(404).send({ error: 'blog not found' });
   res.status(204).json(deletedBlog);
 };
 
@@ -48,6 +54,7 @@ const updateBlog = async (req, res) => {
     likes: body.likes,
   };
   const updatedBlog = await _updateBlog(req.params.id, blog);
+  if (!updatedBlog) return res.status(404).send({ error: 'blog not found' });
   res.status(200).json(updatedBlog);
 };
 

@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js",
-    "test": "jest --verbose"
+    "dev": "NODE_ENV=development nodemon index.js",
+    "test": "NODE_ENV=test jest --verbose --runInBand --forceExit"
   },
   "keywords": [],
   "author": "",
@@ -13,7 +13,8 @@
   "devDependencies": {
     "jest": "^29.3.1",
     "lodash": "^4.17.21",
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.20",
+    "supertest": "^6.3.3"
   },
   "dependencies": {
     "cors": "^2.8.5",

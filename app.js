@@ -10,9 +10,11 @@ const {
   requestLogger,
 } = require('./utils/middleware');
 
+const { _info, _error } = require('./utils/logger');
+
 const app = express();
 
-console.log('connecting to', MONGODB_URI);
+_info('connecting to', MONGODB_URI);
 
 mongoose
   .connect(MONGODB_URI, {
@@ -20,10 +22,10 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    console.log('connected to MongoDB');
+    _info('connected to MongoDB');
   })
   .catch((error) => {
-    console.log('error connecting to MongoDB:', error.message);
+    _error('error connecting to MongoDB:', error.message);
   });
 
 app.use(express.json());
