@@ -65,6 +65,7 @@ describe('adding a blog', () => {
       url: 'test',
       likes: 0,
     };
+
     await api
       .post('/api/blogs')
       .set('Authorization', `Bearer ${token}`)

@@ -8,6 +8,7 @@ const {
   errorHandler,
   unknownEndpoint,
   requestLogger,
+  tokenExtractor,
 } = require('./utils/middleware');
 
 const { _info, _error } = require('./utils/logger');
@@ -33,6 +34,8 @@ mongoose
 app.use(express.json());
 
 app.use(cors());
+
+app.use(tokenExtractor);
 
 app.use(requestLogger);
 
