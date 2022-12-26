@@ -61,8 +61,19 @@ const createBlog = async (req, res) => {
 };
 
 const deleteBlog = async (req, res) => {
+  const token = req.token;
+  if (!token) return res.status(401).send({ error: 'token missing' });
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+  if (!decodedToken.id) return res.status(401).send({ error: 'token invalid' });
+  const blogToDelete = await _getBlog(req.params.id);
+  if (!blogToDelete) return res.status(404).send({ error: 'blog not found' });
+  if (blogToDelete.user.toString() !== decodedToken.id.toString())
+    return res
+      .status(401)
+      .send({
+        error: 'You do not have the right to delete a blog you did not create',
+      });
   const deletedBlog = await _deleteBlog(req.params.id);
-  if (!deletedBlog) return res.status(404).send({ error: 'blog not found' });
   res.status(204).json(deletedBlog);
 };
 

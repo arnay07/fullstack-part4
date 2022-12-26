@@ -1,21 +1,6 @@
 const Blog = require('../models/Blog');
 const User = require('../models/User');
 
-const initialBlogs = [
-  {
-    title: 'React patterns',
-    author: 'Michael Chan',
-    url: 'https://reactpatterns.com/',
-    likes: 7,
-  },
-  {
-    title: 'Go To Statement Considered Harmful',
-    author: 'Edsger W Dijkstra',
-    url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html',
-    likes: 5,
-  },
-];
-
 const nonExistingId = async () => {
   const blog = new Blog({
     title: 'willremovethissoon',
@@ -39,7 +24,6 @@ const usersInDb = async () => {
 };
 
 module.exports = {
-  initialBlogs,
   nonExistingId,
   blogsInDb,
   usersInDb,

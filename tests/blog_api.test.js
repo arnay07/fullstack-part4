@@ -1,14 +1,14 @@
-const { initialBlogs, nonExistingId, blogsInDb } = require('./test_helper');
+const { nonExistingId, blogsInDb } = require('./test_helper');
 
 const Blog = require('../models/Blog');
 const supertest = require('supertest');
 const mongoose = require('mongoose');
 const app = require('../app');
-const User = require('../models/User');
 
 const api = supertest(app);
 
 let token;
+let initialBlogs;
 
 beforeAll(async () => {
   await api.post('/api/users').send({
@@ -27,7 +27,26 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await Blog.deleteMany({});
-  await Blog.insertMany(initialBlogs);
+  const newBlog = {
+    title: 'async/await simplifies making async calls',
+    author: 'tester',
+    url: 'test',
+    likes: 0,
+  };
+
+  const newBlog2 = {
+    title: 'Go To Statement Considered Harmful',
+    author: 'tester',
+    url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
+    likes: 5,
+  };
+
+  await api
+    .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
+    .send(newBlog);
+
+  initialBlogs = await blogsInDb();
 });
 
 describe('when there is initially some blogs saved', () => {
@@ -114,7 +133,10 @@ describe('deletion of a blog', () => {
   test('succeeds with status code 204 if id is valid', async () => {
     const blogsAtStart = await blogsInDb();
     const blogToDelete = blogsAtStart[0];
-    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(204);
     const blogsAtEnd = await blogsInDb();
     expect(blogsAtEnd).toHaveLength(initialBlogs.length - 1);
     const contents = blogsAtEnd.map((r) => r.title);
@@ -123,14 +145,20 @@ describe('deletion of a blog', () => {
 
   test('fails with status code 400 if id is invalid', async () => {
     const invalidId = 'test';
-    await api.delete(`/api/blogs/${invalidId}`).expect(400);
+    await api
+      .delete(`/api/blogs/${invalidId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(400);
     const blogsAtEnd = await blogsInDb();
     expect(blogsAtEnd).toHaveLength(initialBlogs.length);
   });
 
   test('fails with status code 404 if id is not found', async () => {
     const invalidId = await nonExistingId();
-    await api.delete(`/api/blogs/${invalidId}`).expect(404);
+    await api
+      .delete(`/api/blogs/${invalidId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(404);
     const blogsAtEnd = await blogsInDb();
     expect(blogsAtEnd).toHaveLength(initialBlogs.length);
   });
