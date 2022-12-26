@@ -4,8 +4,26 @@ const Blog = require('../models/Blog');
 const supertest = require('supertest');
 const mongoose = require('mongoose');
 const app = require('../app');
+const User = require('../models/User');
 
 const api = supertest(app);
+
+let token;
+
+beforeAll(async () => {
+  await api.post('/api/users').send({
+    username: 'tester',
+    name: 'Test User',
+    password: 'tester',
+  });
+
+  const loginResponse = await api.post('/api/login').send({
+    username: 'tester',
+    password: 'tester',
+  });
+
+  token = loginResponse.body.token;
+});
 
 beforeEach(async () => {
   await Blog.deleteMany({});
@@ -49,6 +67,7 @@ describe('adding a blog', () => {
     };
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/);
@@ -66,6 +85,7 @@ describe('adding a blog', () => {
     };
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/);
@@ -78,7 +98,11 @@ describe('adding a blog', () => {
       author: 'test',
       likes: 0,
     };
-    await api.post('/api/blogs').send(newBlog).expect(400);
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
+      .send(newBlog)
+      .expect(400);
 
     const blogsAtEnd = await blogsInDb();
     expect(blogsAtEnd).toHaveLength(initialBlogs.length);

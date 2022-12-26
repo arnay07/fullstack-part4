@@ -12,6 +12,7 @@ const {
 
 const { _info, _error } = require('./utils/logger');
 const userRouter = require('./routes/UserRoutes');
+const loginRouter = require('./routes/LoginRoutes');
 
 const app = express();
 
@@ -38,6 +39,8 @@ app.use(requestLogger);
 app.use('/api/blogs', blogRouter);
 
 app.use('/api/users', userRouter);
+
+app.use('/api/login', loginRouter);
 
 app.use(unknownEndpoint);
 
