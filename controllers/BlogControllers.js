@@ -7,10 +7,7 @@ const {
   populateDb: _populateDb,
   deleteAllBlogs,
 } = require('../services/BlogServices');
-
-const User = require('../models/User');
-
-const jwt = require('jsonwebtoken');
+const { getUser } = require('../services/UserServices');
 
 const getBlogs = async (req, res) => {
   const blogs = await _getBlogs();
@@ -28,26 +25,17 @@ const getBlog = async (req, res) => {
 
 const createBlog = async (req, res) => {
   const body = req.body;
-  const token = req.token;
-
-  if (!token) {
-    return res.status(401).json({ error: 'token missing' });
-  }
-  const decodedToken = jwt.verify(token, process.env.SECRET);
-
-  if (!decodedToken.id) {
-    return res.status(401).json({ error: 'token invalid' });
-  }
-
-  const user = await User.findById(decodedToken.id);
+  const userId = req.userId;
 
   const blog = {
     title: body.title,
     author: body.author,
     url: body.url,
     likes: body.likes ?? 0,
-    user: user._id,
+    user: userId,
   };
+
+  const user = await getUser(userId);
 
   if (!blog.title || !blog.url) {
     return res.status(400).send({ error: 'title or url missing' });
@@ -61,19 +49,17 @@ const createBlog = async (req, res) => {
 };
 
 const deleteBlog = async (req, res) => {
-  const token = req.token;
-  if (!token) return res.status(401).send({ error: 'token missing' });
-  const decodedToken = jwt.verify(token, process.env.SECRET);
-  if (!decodedToken.id) return res.status(401).send({ error: 'token invalid' });
+  const userId = req.userId;
+  const user = await getUser(userId);
   const blogToDelete = await _getBlog(req.params.id);
   if (!blogToDelete) return res.status(404).send({ error: 'blog not found' });
-  if (blogToDelete.user.toString() !== decodedToken.id.toString())
-    return res
-      .status(401)
-      .send({
-        error: 'You do not have the right to delete a blog you did not create',
-      });
+  if (blogToDelete.user.toString() !== userId.toString())
+    return res.status(401).send({
+      error: 'You do not have the right to delete a blog you did not create',
+    });
   const deletedBlog = await _deleteBlog(req.params.id);
+  user.blogs = user.blogs.filter((blog) => blog.toString() !== deletedBlog._id);
+  await user.save();
   res.status(204).json(deletedBlog);
 };
 

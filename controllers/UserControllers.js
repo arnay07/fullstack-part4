@@ -1,6 +1,7 @@
 const {
   createUser: _createUser,
   getUsers: _getUsers,
+  getUser: _getUser,
 } = require('../services/UserServices');
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
@@ -36,6 +37,15 @@ const createUser = async (req, res) => {
 const getUsers = async (req, res) => {
   const users = await _getUsers();
   res.json(users);
+};
+
+const getUser = async (req, res) => {
+  const user = await _getUser(req.params.id);
+  if (user) {
+    res.json(user);
+  } else {
+    res.status(404).send({ error: 'user not found' });
+  }
 };
 
 module.exports = {

@@ -46,6 +46,11 @@ beforeEach(async () => {
     .set('Authorization', `Bearer ${token}`)
     .send(newBlog);
 
+  await api
+    .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
+    .send(newBlog2);
+
   initialBlogs = await blogsInDb();
 });
 

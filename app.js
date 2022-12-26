@@ -9,6 +9,7 @@ const {
   unknownEndpoint,
   requestLogger,
   tokenExtractor,
+  userExtractor,
 } = require('./utils/middleware');
 
 const { _info, _error } = require('./utils/logger');
@@ -36,6 +37,8 @@ app.use(express.json());
 app.use(cors());
 
 app.use(tokenExtractor);
+
+app.use(userExtractor);
 
 app.use(requestLogger);
 
