@@ -2,6 +2,7 @@ const express = require('express');
 const { MONGODB_URI } = require('./utils/config');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const helmet = require('helmet');
 require('express-async-errors'); // Must be put before routes otherwise it won't work
 const blogRouter = require('./routes/BlogRoutes');
 const {
@@ -10,6 +11,7 @@ const {
   requestLogger,
   tokenExtractor,
   userExtractor,
+  responseTime,
 } = require('./utils/middleware');
 
 const { _info, _error } = require('./utils/logger');
@@ -36,9 +38,13 @@ app.use(express.json());
 
 app.use(cors());
 
+app.use(helmet());
+
 app.use(tokenExtractor);
 
 app.use(userExtractor);
+
+app.use(responseTime());
 
 app.use(requestLogger);
 
