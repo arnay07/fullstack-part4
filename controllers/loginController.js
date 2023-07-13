@@ -1,22 +1,22 @@
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const User = require('../models/User');
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const User = require("../models/User");
 
 const login = async (req, res) => {
   const { username, password } = req.body;
   if (!username) {
-    return res.status(400).send({ error: 'username missing' });
+    return res.status(400).send({ error: "username missing" });
   }
   const user = await User.findOne({ username });
   if (!user) {
-    return res.status(401).json({ error: 'invalid username' });
+    return res.status(401).json({ error: "invalid username" });
   }
   if (!password) {
-    return res.status(400).send({ error: 'password missing' });
+    return res.status(400).send({ error: "password missing" });
   }
-  const passwordCorrect = await bcrypt.compare(password, user.passwordHash);
+  const passwordCorrect = bcrypt.compare(password, user.passwordHash);
   if (!passwordCorrect) {
-    return res.status(401).json({ error: 'invalid password' });
+    return res.status(401).json({ error: "invalid password" });
   }
   const userForToken = {
     username: user.username,
